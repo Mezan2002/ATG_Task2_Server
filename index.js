@@ -61,6 +61,30 @@ const run = async () => {
     });
     // Login User API End
 
+    // Match Username on Forgot Password API Start
+    app.get("/matchUserName", async (req, res) => {
+      const userName = req.query.userName;
+      const query = { userName: userName };
+      const result = await users.findOne(query);
+      res.send(result);
+    });
+    // Match Username on Forgot Password API End
+
+    // Forgot Password API Start
+    app.patch("/recoverPass/:userName", async (req, res) => {
+      const userName = req.params.userName;
+      const password = req.body;
+      const filter = { userName: userName };
+      const updatedDoc = {
+        $set: {
+          password: password,
+        },
+      };
+      const result = await users.updateOne(filter, updatedDoc);
+      res.send(result);
+    });
+    // Forgot Password API End
+
     // Create Post API Start
     app.post("/createPost", async (req, res) => {
       const post = req.body;
@@ -111,20 +135,14 @@ const run = async () => {
     });
     // Delete Post API End
 
-    // Like Post API Start
-    app.put("/like/:id", async (req, res) => {
-      const id = req.params.id;
-      const filter = { _id: ObjectId(id) };
-      const options = { upsert: true };
-      const updatedDoc = {
-        $set: {
-          like: "liked",
-        },
-      };
-      const result = await posts.updateOne(filter, updatedDoc, options);
+    // Like and Comment Post API Start
+    app.post("/like&comment", async (req, res) => {
+      const likeComment = req.body;
+      console.log(likeComment);
+      const result = await posts.insertOne(likeComment);
       res.send(result);
     });
-    // Like Post API End
+    // Like and Comment Post API End
   } finally {
   }
 };
